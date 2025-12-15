@@ -70,7 +70,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 
 
 def main() -> None:
-    token = "7589355887:AAH5bLFpgTmbWui4iu8pwlH0dFFATH57jzs"
+    token = "TOKEN"
 
     application = Application.builder().token(token).build()
     application.add_handler(CommandHandler("start", start))
@@ -80,4 +80,5 @@ def main() -> None:
     application.run_polling()
 
 if __name__ == "__main__":
+
     main()
