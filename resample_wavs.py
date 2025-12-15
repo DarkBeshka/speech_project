@@ -1,5 +1,4 @@
 import argparse
-import os
 from pathlib import Path
 
 import soundfile as sf
@@ -19,7 +18,6 @@ def save_audio(path: Path, audio, sr: int, subtype: str = "PCM_16"):
 def resample_audio(audio, orig_sr: int, target_sr: int):
     if orig_sr == target_sr:
         return audio
-    # Используем resample_poly для устойчивого ресемпла
     from math import gcd
 
     g = gcd(orig_sr, target_sr)
@@ -87,4 +85,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
