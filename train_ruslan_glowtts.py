@@ -57,7 +57,7 @@ config = GlowTTSConfig(
     mixed_precision=True,
     output_path=OUTPUT_PATH,
     datasets=[dataset_config],
-    #исправление взрывающихся градиентов:
+    #попытка исправитье взрывающиеся градиенты:
     lr=0.0002,              #уменьшаем learning rate (было 0.001 по умолчанию)
     grad_clip=1.0,          #больший gradient clipping (было 5.0)
     lr_scheduler="NoamLR",
@@ -73,7 +73,7 @@ config.characters = CharactersConfig(
     blank="<BLNK>",
     characters="абвгдеёжзийклмнопрстуфхцчшщъыьэюя"
                "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ",
-    punctuations=" !'(),-.:;?«»”/*…–—’",
+    punctuations=" !'(),-.:;?«»”/*…–—’“„<>",
     phonemes=None,
     is_unique=True,
     is_sorted=False,
@@ -91,16 +91,8 @@ train_samples, eval_samples = load_tts_samples(
     eval_split=False,  #мы явно указали meta_file_val
 )
 
-
-# Fixup audio paths: some formatters build paths like "RUSLAN/xxx.wav" under
-# the dataset root, but your files live directly in `data` (the dataset root).
-# Remap sample audio paths to existing files under `DATASET_PATH` when needed.
 def _fix_sample_paths(samples, dataset_root):
-    """Attempt to normalize/fix audio paths inside samples.
-
-    Supports samples that are `list`/`tuple` (text, audio_path, ...)
-    or `dict` with common audio keys. Returns (checked_count, fixed_count).
-    """
+    """Исправляет пути до аудио(костыль)"""
     if not samples:
         return 0, 0
     fixed = 0
@@ -122,7 +114,6 @@ def _fix_sample_paths(samples, dataset_root):
             audio_p = None
             setter = None
 
-            # list or tuple-like samples
             if isinstance(s, (list, tuple)):
                 if len(s) < 2:
                     continue
@@ -134,18 +125,14 @@ def _fix_sample_paths(samples, dataset_root):
                     if isinstance(cur, list):
                         cur[1] = new_p
                     else:
-                        # tuple -> replace with new tuple
                         newt = tuple([cur[0], new_p] + list(cur[2:]))
                         samples_ref[idx] = newt
 
                 setter = _set_list_path
 
-            # dict-like samples
             elif isinstance(s, dict):
-                # find a likely key
                 key = next((k for k in common_keys if k in s), None)
                 if key is None:
-                    # try numeric keys (some code uses {0: text, 1: path})
                     if 1 in s:
                         key = 1
                 if key is None:
@@ -159,13 +146,11 @@ def _fix_sample_paths(samples, dataset_root):
                 setter = _set_dict_path
 
             else:
-                # unexpected sample shape; skip
                 continue
 
             if not audio_p:
                 continue
 
-            # if path exists already, nothing to do
             if os.path.isabs(audio_p):
                 if os.path.exists(audio_p):
                     continue
@@ -173,14 +158,12 @@ def _fix_sample_paths(samples, dataset_root):
                 if os.path.exists(audio_p):
                     continue
 
-            # try basename under dataset root
             base_candidate = os.path.join(dataset_root, os.path.basename(str(audio_p)))
             if os.path.exists(base_candidate):
                 setter(base_candidate)
                 fixed += 1
                 continue
 
-            # try joining the relative path under dataset root (handles RUSLAN/xxx.wav)
             joined_candidate = os.path.join(dataset_root, str(audio_p))
             if os.path.exists(joined_candidate):
                 setter(joined_candidate)
@@ -188,14 +171,11 @@ def _fix_sample_paths(samples, dataset_root):
                 continue
 
         except Exception:
-            # don't fail hard here — log and continue
             print("Warning: failed to inspect/fix sample at index", i, "error:", sys.exc_info()[1])
             continue
 
     return checked, fixed
 
-
-# apply fix to loaded samples
 checked_train, fixed_train = _fix_sample_paths(train_samples, DATASET_PATH)
 checked_eval, fixed_eval = _fix_sample_paths(eval_samples, DATASET_PATH)
 print(f"Fixed audio paths: train checked={checked_train} fixed={fixed_train}, eval checked={checked_eval} fixed={fixed_eval}")
