@@ -1,19 +1,7 @@
-"""
-Скрипт для запуска TensorBoard и анализа attention plots из логов обучения GlowTTS.
-
-Использование:
-    python view_tensorboard.py [путь_к_эксперименту]
-
-Если путь не указан, будет использован последний эксперимент.
-"""
-
-import os
 import sys
 import subprocess
-import glob
 from pathlib import Path
 
-# Путь к директории с экспериментами
 EXPERIMENTS_DIR = Path("ruslan_glowtts_exp")
 
 def find_latest_experiment():
@@ -49,12 +37,12 @@ def analyze_training_log(exp_path):
     with open(log_file, 'r', encoding='utf-8', errors='ignore') as f:
         lines = f.readlines()
     
-    # Ищем финальные значения loss
+    #ищем финальные значения loss
     final_losses = []
-    for line in reversed(lines[-500:]):  # Последние 500 строк
+    for line in reversed(lines[-500:]):  #последние 500 строк
         if "loss:" in line and "avg_loss:" not in line:
             try:
-                # Пытаемся извлечь значение loss
+                #пытаемся извлечь значение loss
                 parts = line.split("loss:")
                 if len(parts) > 1:
                     loss_val = parts[1].strip().split()[0]
@@ -78,7 +66,7 @@ def analyze_training_log(exp_path):
         else:
             print("✅ Loss низкий (<0.5). Модель должна работать хорошо.")
     
-    # Ищем проблемы с градиентами
+    #ищем проблемы с градиентами
     grad_norms = []
     for line in reversed(lines[-1000:]):
         if "grad_norm:" in line:
@@ -115,7 +103,7 @@ def analyze_training_log(exp_path):
         else:
             print("✅ Градиенты в нормальном диапазоне (1-50). Обучение стабильно.")
     
-    # Проверяем наличие ошибок
+    #проверяем наличие ошибок
     error_count = sum(1 for line in lines if "error" in line.lower() or "exception" in line.lower() or "traceback" in line.lower())
     if error_count > 0:
         print(f"\n❌ Найдено {error_count} упоминаний ошибок в логах!")
@@ -127,7 +115,7 @@ def analyze_training_log(exp_path):
     }
 
 def main():
-    # Определяем путь к эксперименту
+    #определяем путь к эксперименту
     if len(sys.argv) > 1:
         exp_path = Path(sys.argv[1])
         if not exp_path.exists():
@@ -141,7 +129,7 @@ def main():
     print(f"\n🔍 Анализ эксперимента: {exp_path.name}")
     print(f"📁 Полный путь: {exp_path.absolute()}")
     
-    # Проверяем наличие логов TensorBoard
+    #проверяем наличие логов TensorBoard
     has_logs, log_files = check_tensorboard_logs(exp_path)
     
     if not has_logs:
@@ -149,10 +137,10 @@ def main():
     else:
         print(f"\n✅ Найдено {len(log_files)} файл(ов) логов TensorBoard")
     
-    # Анализируем текстовый лог
+    #анализируем текстовый лог
     analysis = analyze_training_log(exp_path)
     
-    # Запускаем TensorBoard
+    #запускаем TensorBoard
     print("\n" + "="*70)
     print("🚀 ЗАПУСК TENSORBOARD")
     print("="*70)
@@ -178,7 +166,6 @@ def main():
     print(f"   Нажмите Ctrl+C для остановки TensorBoard\n")
     
     try:
-        # Use TensorBoard's Python API to start the server programmatically.
         from tensorboard import program
 
         tb = program.TensorBoard()
@@ -186,20 +173,15 @@ def main():
         url = tb.launch()
         print(f"\n🚀 TensorBoard запущен: {url}")
         print("Нажмите Ctrl+C в этом окне для остановки TensorBoard.")
-
-        # Keep the script alive while TensorBoard runs until interrupted.
         try:
             while True:
-                # Sleep in small increments so KeyboardInterrupt is responsive.
                 import time
                 time.sleep(1)
         except KeyboardInterrupt:
             print("\n\n👋 TensorBoard остановлен.")
     except ImportError:
-        # If tensorboard isn't importable, suggest installation or run via system entrypoint.
         print("\n❌ TensorBoard не установлен как модуль Python.")
         print("   Попробуйте установить: pip install tensorboard")
-        # Try falling back to system 'tensorboard' executable if available.
         try:
             subprocess.run(["tensorboard", "--logdir", logdir, "--port", "6006"])
         except FileNotFoundError:
@@ -209,4 +191,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
