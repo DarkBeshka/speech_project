@@ -65,13 +65,15 @@ TensorBoard запускается через `view_tensorboard.py`.
 - Более агрессивный Gradient Clipping(уменьшен в 5 раз) - ограничивает максимальную величину градиентов;
 - Увеличен Warmup Steps(в 2 раза) - дает модели время "разогреться" перед полным обучением;
 
+Остальные метрики(alignment, loss, пр.) были в пределах нормы и демонстрировали ожидаемое поведение.
+
 На этом этапе также была реализована обретка для Telegram-бота, который принимает от пользователя сообщение - текст, который необходимо озвучить, а выдает аудиосообщение с озвучкой этой фразы.
 
 Далее модель заново была обучена на 32 эпохах, однако результат оказался еще хуже, чем был до этого, что, к тому же, не решило проблему с градиентами. Скриншоты из TensorBoard прилагаю:
 <img width="1766" height="717" alt="image" src="https://github.com/user-attachments/assets/d068b2d3-d309-4106-826f-635a955d270e" />
 <img width="1969" height="922" alt="image" src="https://github.com/user-attachments/assets/8da2916a-b56b-469d-a36e-1f9853d2156f" />
 <img width="1972" height="388" alt="image" src="https://github.com/user-attachments/assets/472a4271-a446-4507-81ed-001f842f89c9" />
-<img width="1974" height="920" alt="image" src="https://github.com/user-attachments/assets/f4900e1f-c667-4153-a762-3913320664a8" />
+<img width="1974" height="920" alt="image" src="https://github.com/user-attachments/assets/26cd4a5d-fac8-4e1f-9ad4-f265c81f22e6" />
 
 Видеорезультат работы Telegram-бота на видео(звук в аудио есть, просто тихий и не похож на речь - модель после принятия мер к градиентам отрабатывает хуже):
 
