@@ -87,6 +87,8 @@ https://github.com/user-attachments/assets/120d63e7-a9ff-457b-987a-81adf24f5380
 
 Результат синтеза речи представлен в репозитории в файле `fifth_output.wav`(тестовая фраза по-прежнему _"Привет. Это тест модели"_). Результат уже напоминает задатки человеческой речи, однако все еще далеко от ожидаемого произношения.
 
+`sixth_output.wav` - результат обучения на 100 эпохах. Звук стал менее роботизированным, но звуки по-прежнему не соответствуют тексту.
+
 Обновленные показания Tensorboard:
 <img width="1975" height="733" alt="image" src="https://github.com/user-attachments/assets/f8a9d130-890f-4fba-b5a2-db0a3f316e19" />
 <img width="1964" height="920" alt="image" src="https://github.com/user-attachments/assets/13f763d4-3e59-496c-9a47-dac78fd744c9" />
