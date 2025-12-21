@@ -98,7 +98,7 @@ https://github.com/user-attachments/assets/120d63e7-a9ff-457b-987a-81adf24f5380
 
 Обновленное видео использования инференса через Телеграм:
 
-https://github.com/user-attachments/assets/eb1e86c8-b23e-47e6-a065-d4ef613bb057
+https://github.com/user-attachments/assets/341f87ad-b1b0-4368-89fb-3ec695e7e841
 
 Всего работа над проектом заняла около месяца с половиной.
 
